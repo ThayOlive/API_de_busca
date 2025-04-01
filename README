@@ -1,0 +1,27 @@
+Olá, essa é uma API de Busca que desenvolvi para um processo seletivo de estágio! 
+
+Para rodá-la siga os passos a seguir:
+
+Crie um ambiente virtual:
+
+python3 -m venv venv
+
+Agora, ative-o:
+venv/scripts/activate
+
+Instale os requerimentos necessários:
+
+pip install -r requirements.txt
+
+Rode o servidor com o comando:
+
+python manage.py runserver
+
+Vá para a pasta 'Frontend' e acesse o arquivo index.html
+
+Use a extensão Open with Live Server e teste uma busca!
+
+Obrigada por chegar até aqui ^.^
+
+Se tiver algo a agregar estou aberta a sugestões e a novas ideias.
+

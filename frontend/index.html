@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscar registros</title>
+</head>
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+         * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        input {
+            width: 70%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            outline: none;
+        }
+
+        button {
+            background-color: #6a0dad;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background-color: #5a0090;
+        }
+
+        p.erro {
+            color: red;
+            font-weight: bold;
+        }
+
+        .table-container {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #6a0dad;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+</style>
+    <div id="app" class="container">
+        <h2>Buscar Registro</h2>
+    <div class="search-box">
+        <input type="text" v-model="query" placeholder="Digite um termo..." />
+        <button @click="buscarRegistro">Buscar</button>
+    </div>
+        <p v-if="erro" class="erro">{{ erro }}</p>
+    <div class="table-container" v-if="resultados.length > 0">
+        <table>
+                <thead>
+                        <th>Registro ANS</th>
+                        <th>CNPJ</th>
+                        <th>Razão Social</th>
+                        <th>Nome Fantasia</th>
+                        <th>Modalidade</th>
+                        <th>Logradouro</th>
+                        <th>Número</th>
+                        <th>Complemento</th>
+                        <th>Bairro</th>
+                        <th>Cidade</th>
+                        <th>UF</th>
+                        <th>CEP</th>
+                        <th>DDD</th>
+                        <th>Telefone</th>
+                        <th>Fax</th>
+                        <th>Endereço eletrônico</th>
+                        <th>Representante</th>
+                        <th>Cargo do Representante</th>
+                        <th>Região de comercialização</th>
+                        <th>Data do resgistro ANS</th>
+                </thead>
+                <tbody>
+                    <tr v-for="dado in resultados" :key="dado.id">
+                        <td>{{ dado.registro_ans }}</td>
+                        <td>{{ dado.cnpj }}</td>
+                        <td>{{ dado.razao_social }}</td>
+                        <td>{{ dado.nome_fantasia }}</td>
+                        <td>{{ dado.modalidade }}</td>
+                        <td>{{ dado.logradouro }}</td>
+                        <td> {{ dado.numero }}</td>
+                        <td> {{ dado.complemento }}</td>
+                        <td> {{ dado.bairro }}</td>
+                        <td>{{ dado.cidade }}</td>
+                        <td>{{ dado.uf }}</td>
+                        <td> {{ dado.cep }}</td>
+                        <td>{{ dado.ddd }}</td>
+                        <td> {{ dado.bairro }}</td>
+                        <td>{{ dado.bairro }}</td>
+                        <td>{{ dado.bairro }}</td>
+                        <td> {{ dado.representante }}</td>
+                        <td> {{ dado.cargo_representante }}</td>
+                        <td>{{ dado.regiao_de_comercializacao }}</td>
+                        <td>{{ dado.data_registro_ans }}</td>
+                
+                </tbody>
+                 
+        </table>
+            
+          
+    </div>
+
+        <p v-if="resultados.length === 0 && !erro">Nenhum resultado encontrado.</p>
+    </div>
+<script>
+
+const { createApp, ref } = Vue
+
+createApp({
+    setup() {
+        const query = ref("")
+        const resultados = ref([])
+        const erro = ref("")
+
+        const buscarRegistro = async () => {
+            erro.value = ""
+            resultados.value = []
+
+            try {
+                const response = await axios.get(`http://127.0.0.1:8000/api/registros/buscar/?q=${query.value}`)
+                resultados.value = response.data
+            } catch (error) {
+                if (error.response && error.response.status === 404) {
+                    erro.value = "Nenhum resultado encontrado."
+                } else {
+                    erro.value = "Erro ao buscar dados."
+                }
+            }
+        }
+
+        return { query, buscarRegistro, resultados, erro }
+    }
+}).mount('#app')
+</script>
+
+
+</body>
+</html>
