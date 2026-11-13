@@ -1,26 +1,156 @@
-Olá, essa é uma API de busca textual!
+# API de busca textual
 
-Para rodá-la siga os passos a seguir:
+API desenvolvida com **Python**, **Django REST Framework** e **PostgreSQL**, acompanhada de uma interface de busca feita com **Vue.js** e Axios. A busca consulta registros da tabela `relatorio_cadop` por diferentes campos cadastrais.
 
-Crie um ambiente virtual:
+> Este README descreve o estado atual do repositório. A API depende de uma base PostgreSQL previamente configurada e da tabela `relatorio_cadop` com o esquema esperado pelo modelo.
 
+## Funcionalidades
+
+- Busca textual sem diferenciar maiúsculas e minúsculas (`icontains`).
+- Consulta por razão social, CNPJ, registro ANS, nome fantasia, logradouro, representante e cargo do representante.
+- Endpoint para listar os registros disponíveis.
+- Interface web simples para enviar uma busca e visualizar os resultados.
+
+## Tecnologias
+
+- Python 3
+- Django 5.1
+- Django REST Framework
+- PostgreSQL (`psycopg2`)
+- Vue 3 e Axios, carregados por CDN na página do frontend
+
+As dependências do backend estão listadas em [`requirements.txt`](requirements.txt).
+
+## Como funciona
+
+```text+
+Navegador (Vue.js + Axios)
+          │
+          │ GET /api/registros/buscar/?q=termo
+          ▼
+API Django REST Framework
+          │
+          ▼
+PostgreSQL · tabela relatorio_cadop
+```
+
+O modelo Django usa `managed = False`. Isso significa que o Django não cria nem altera essa tabela por meio de migrações. O banco e a tabela precisam existir antes de iniciar a aplicação. O repositório não contém um script de criação ou carga inicial para a tabela.
+
+## Pré-requisitos
+
+- Python instalado
+- PostgreSQL acessível
+- Uma base com a tabela `relatorio_cadop` e as colunas esperadas pela aplicação
+- Um servidor local para abrir a página do frontend (por exemplo, a extensão Live Server do VS Code)
+
+## Configuração e execução
+
+Clone o repositório e entre na pasta:
+
+```bash
+git clone https://github.com/ThayOlive/API_de_busca.git
+cd API_de_busca
+```
+
+Crie e ative um ambiente virtual. No Windows PowerShell:
+
+```powershell
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+```
+
+No macOS ou Linux:
+
+```bash
 python3 -m venv venv
+source venv/bin/activate
+```
 
-Agora, ative-o:
-venv/scripts/activate
+Instale as dependências:
 
-Instale os requerimentos necessários:
+```bash
+python -m pip install -r requirements.txt
+```
 
-pip install -r requirements.txt
+### Variáveis de ambiente
 
-Rode o servidor com o comando:
+A aplicação lê a configuração com `python-decouple`. Crie um arquivo `.env` na raiz do projeto com os valores do seu ambiente:
 
+```dotenv
+SECRET_KEY=uma-chave-local-para-desenvolvimento
+DEBUG=True
+DB_NAME=nome_da_base
+DB_USER=usuario_do_postgres
+DB_PASSWORD=sua_senha
+DB_HOST=localhost
+DB_PORT=5432
+```
+
+Substitua os valores de banco pelos dados da sua instalação PostgreSQL. Não publique senhas ou chaves reais no GitHub.
+
+### Inicie a API
+
+Com o ambiente virtual ativo e o PostgreSQL configurado:
+
+```bash
 python manage.py runserver
+```
 
-Vá para a pasta 'Frontend' e acesse o arquivo index.html
+O servidor de desenvolvimento do Django ficará disponível, por padrão, em `http://127.0.0.1:8000`.
 
-Use a extensão Open with Live Server e teste uma busca!
+### Abra a interface
 
-Obrigada por chegar até aqui ^.^
+Abra `frontend/index.html` com o Live Server. A configuração CORS do projeto permite a origem local padrão `http://127.0.0.1:5500`.
 
+A interface está configurada para consultar a API em `http://127.0.0.1:8000`. Se mudar a porta ou o endereço do backend, ajuste a URL da requisição no arquivo `frontend/index.html`.
 
+## Rotas disponíveis
+
+| Método | Rota | Descrição |
+|---|---|---|
+| `GET` | `/api/registros` | Retorna os registros disponíveis na tabela. |
+| `GET` | `/api/registros/buscar/?q=termo` | Pesquisa o termo nos campos de texto configurados. |
+
+Exemplo de busca:
+
+```text
+http://127.0.0.1:8000/api/registros/buscar/?q=saude
+```
+
+A resposta de sucesso é uma lista JSON de registros. Sem o parâmetro `q`, a API retorna `400`. Quando não encontra correspondências, retorna `404`.
+
+## Estrutura do projeto
+
+```text
+API_de_busca/
+├── core/
+│   ├── models.py       # Mapeamento da tabela relatorio_cadop
+│   ├── serializers.py  # Serialização dos registros em JSON
+│   └── views.py        # Listagem e busca
+├── frontend/
+│   └── index.html      # Interface Vue.js
+├── teste_api/
+│   ├── settings.py     # Configuração do Django e PostgreSQL
+│   └── urls.py         # Rotas da API
+├── manage.py
+├── requirements.txt
+└── README.md
+```
+
+## Observações
+
+- A busca usa `icontains` nos campos configurados no endpoint; o comportamento depende dos dados e da configuração do banco.
+- A rota de listagem retorna os registros disponíveis sem paginação implementada no código atual.
+- O frontend acessa uma URL local fixa para o backend.
+- Para executar o projeto em outro ambiente, configure o PostgreSQL, as variáveis `.env` e, se necessário, os endereços permitidos em CORS.
+
+## Próximos passos possíveis
+
+- Adicionar instruções ou scripts para criar e carregar a tabela necessária.
+- Incluir testes automatizados para os endpoints.
+- Tornar o endereço da API configurável no frontend.
+- Avaliar paginação para consultas com muitos registros.
+
+## Autoria
+
+Projeto de estudo de **ThayOlive**. Sugestões e melhorias são bem-vindas por meio de issues ou pull requests.
